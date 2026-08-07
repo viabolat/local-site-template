@@ -1,0 +1,29 @@
+{
+  "trade_type": "plumber",
+  "emergency_banner_default": true,
+  "pricing_display_default": "estimate",
+  "default_services": [
+    { "title": "Drain Cleaning", "icon": "drain", "description_hint": "clearing clogs, slow drains" },
+    { "title": "Water Heater Repair & Installation", "icon": "water-heater", "description_hint": "repair, replacement, tankless upgrades" },
+    { "title": "Leak Detection & Repair", "icon": "leak", "description_hint": "pipe leaks, slab leaks" },
+    { "title": "Emergency Plumbing", "icon": "emergency", "description_hint": "24/7 response for burst pipes, no hot water, etc." },
+    { "title": "Fixture Installation", "icon": "faucet", "description_hint": "faucets, toilets, sinks" }
+  ],
+  "icon_set": {
+    "drain": "wrench-drain-icon",
+    "water-heater": "water-heater-icon",
+    "leak": "droplet-icon",
+    "emergency": "alert-icon",
+    "faucet": "faucet-icon"
+  },
+  "seo_defaults": {
+    "primary_service_examples": ["Emergency Plumbing", "Residential Plumbing", "Drain Cleaning"]
+  },
+  "trust_badge_examples": [
+    "Licensed & Insured",
+    "24/7 Emergency Response",
+    "Family-Owned Since {year}",
+    "Upfront, Flat-Rate Pricing"
+  ],
+  "notes": "This preset provides DEFAULTS only. All content must still be run through COPYWRITING_AND_SEO.md rules and rewritten uniquely per client. Never ship these description_hint values verbatim as final copy."
+}

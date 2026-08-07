@@ -1,0 +1,206 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Placeholder config — this block stands in for client.config.json until a real
+// client is scaffolded (see CLIENT_CONFIG_SCHEMA.md). No real business data belongs
+// here; every value below is a TODO for the per-client generation step.
+const business = {
+	name: '[Business Name]',
+	primaryService: '[Primary Service]',
+	city: '[City]',
+	phone: '[555-555-5555]',
+	phoneHref: 'tel:+15555555555',
+	yearsInBusiness: '[X]',
+	hours: '[Mon–Fri: 8am–6pm, Sat: 9am–2pm, Sun: Closed]',
+	address: '[Street Address, City, State ZIP]',
+};
+
+// Trade-specific toggles (config-driven, not separate templates) — see
+// "Trade-Specific Toggles" in SITE_TEMPLATE_SPEC.md.
+const emergencyBanner = false;
+const pricingDisplay = 'fixed'; // "fixed" | "estimate" | "none"
+
+const services = [
+	{ title: '[Service One]', description: '[One to two sentences describing this service, unique to this client.]' },
+	{ title: '[Service Two]', description: '[One to two sentences describing this service, unique to this client.]' },
+	{ title: '[Service Three]', description: '[One to two sentences describing this service, unique to this client.]' },
+	{ title: '[Service Four]', description: '[One to two sentences describing this service, unique to this client.]' },
+];
+
+const serviceAreas = ['[Neighborhood One]', '[Neighborhood Two]', '[Neighborhood Three]', '[Neighborhood Four]'];
+
+const galleryPlaceholders = Array.from({ length: 6 }, (_, i) => i + 1);
+---
+
+<Layout
+	title={`${business.name} | ${business.primaryService} in ${business.city}`}
+	description={`${business.name} provides ${business.primaryService} in ${business.city}. TODO: replace with client-specific SEO description.`}
+>
+	<main id="main-content">
+		<!-- 1. Hero -->
+		<header class="bg-slate-900 text-white">
+			{
+				emergencyBanner && (
+					<div class="bg-red-600 px-4 py-2 text-center text-sm font-semibold text-white">
+						24/7 Emergency Service Available
+					</div>
+				)
+			}
+			<div class="mx-auto flex max-w-5xl flex-col items-start gap-6 px-6 py-20">
+				<p class="text-lg font-semibold text-blue-300">{business.name}</p>
+				<h1 class="text-4xl font-bold leading-tight sm:text-5xl">
+					{business.primaryService} in {business.city}
+				</h1>
+				<p class="max-w-2xl text-lg text-slate-300">
+					[One sentence of differentiation — years in business, guarantee, satisfaction promise, etc.]
+				</p>
+				<div class="flex flex-wrap gap-4">
+					<a
+						href={business.phoneHref}
+						class="rounded-md bg-blue-600 px-6 py-3 text-lg font-semibold text-white transition hover:bg-blue-500 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300"
+					>
+						Call {business.phone}
+					</a>
+					<a
+						href="#contact"
+						class="rounded-md border border-white px-6 py-3 text-lg font-semibold text-white transition hover:bg-white hover:text-slate-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300"
+					>
+						Get a Free Quote
+					</a>
+				</div>
+			</div>
+		</header>
+
+		<!-- 2. Services -->
+		<section aria-labelledby="services-heading" class="mx-auto max-w-5xl px-6 py-16">
+			<h2 id="services-heading" class="text-3xl font-bold">Our Services</h2>
+			<p class="mt-2 text-slate-600">
+				{pricingDisplay === 'fixed' && 'Straightforward, upfront pricing on every job.'}
+				{pricingDisplay === 'estimate' && 'Free estimates on every service below.'}
+				{pricingDisplay === 'none' && 'Contact us for details on any service below.'}
+			</p>
+			<ul class="mt-8 grid gap-6 sm:grid-cols-2">
+				{
+					services.map((service) => (
+						<li class="rounded-lg border border-slate-200 p-6">
+							<div class="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-blue-100 text-blue-700" aria-hidden="true">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+									<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+							</div>
+							<h3 class="text-xl font-semibold">{service.title}</h3>
+							<p class="mt-2 text-slate-600">{service.description}</p>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		<!-- 3. Trust Signals -->
+		<section aria-labelledby="trust-heading" class="bg-slate-50 px-6 py-16">
+			<div class="mx-auto max-w-5xl">
+				<h2 id="trust-heading" class="text-3xl font-bold">Why Choose Us</h2>
+				<dl class="mt-8 grid gap-8 sm:grid-cols-3">
+					<div>
+						<dt class="text-sm font-semibold uppercase tracking-wide text-slate-500">Years in Business</dt>
+						<dd class="mt-1 text-2xl font-bold">{business.yearsInBusiness}</dd>
+					</div>
+					<div>
+						<dt class="text-sm font-semibold uppercase tracking-wide text-slate-500">Licensed &amp; Insured</dt>
+						<dd class="mt-1 text-2xl font-bold">[TODO: confirm with client before publishing]</dd>
+					</div>
+					<div>
+						<dt class="text-sm font-semibold uppercase tracking-wide text-slate-500">Certifications</dt>
+						<dd class="mt-1 text-2xl font-bold">[TODO: add if provided by client]</dd>
+					</div>
+				</dl>
+			</div>
+		</section>
+
+		<!-- 4. Reviews / Social Proof -->
+		<section aria-labelledby="reviews-heading" class="mx-auto max-w-5xl px-6 py-16">
+			<h2 id="reviews-heading" class="text-3xl font-bold">What Our Customers Say</h2>
+			<p class="mt-2 text-sm text-slate-500">
+				[TODO: replace with 3–5 real reviews before launch. Omit this section entirely if the client has none yet — never fabricate reviews.]
+			</p>
+			<ul class="mt-8 grid gap-6 sm:grid-cols-3">
+				{
+					[1, 2, 3].map((n) => (
+						<li class="rounded-lg border border-slate-200 p-6">
+							<div class="text-amber-500" aria-label="Placeholder rating">★★★★★</div>
+							<p class="mt-3 text-slate-600">"[Placeholder review quote — replace with a real client review.]"</p>
+							<p class="mt-3 font-semibold">[Reviewer Name {n}]</p>
+						</li>
+					))
+				}
+			</ul>
+		</section>
+
+		<!-- 5. Gallery -->
+		<section aria-labelledby="gallery-heading" class="bg-slate-50 px-6 py-16">
+			<div class="mx-auto max-w-5xl">
+				<h2 id="gallery-heading" class="text-3xl font-bold">Recent Work</h2>
+				<p class="mt-2 text-sm text-slate-500">[TODO: replace with real client-supplied photos and descriptive alt text.]</p>
+				<ul class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+					{
+						galleryPlaceholders.map((n) => (
+							<li class="flex aspect-square items-center justify-center rounded-lg bg-slate-200 text-slate-400" role="img" aria-label={`Placeholder photo ${n} of completed work — TODO: replace with real client photo and descriptive alt text`}>
+								Photo {n}
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</section>
+
+		<!-- 6. Service Area -->
+		<section aria-labelledby="service-area-heading" class="mx-auto max-w-5xl px-6 py-16">
+			<h2 id="service-area-heading" class="text-3xl font-bold">Proudly Serving</h2>
+			<ul class="mt-6 flex flex-wrap gap-3">
+				{
+					serviceAreas.map((area) => (
+						<li class="rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700">{area}</li>
+					))
+				}
+			</ul>
+			<div class="mt-8 flex aspect-video items-center justify-center rounded-lg bg-slate-200 text-slate-400" role="img" aria-label="Placeholder service area map — TODO: embed real map if used">
+				[Optional embedded map]
+			</div>
+		</section>
+
+		<!-- 7. Contact -->
+		<section id="contact" aria-labelledby="contact-heading" class="bg-slate-900 px-6 py-16 text-white">
+			<div class="mx-auto max-w-5xl grid gap-12 sm:grid-cols-2">
+				<div>
+					<h2 id="contact-heading" class="text-3xl font-bold">Get In Touch</h2>
+					<a href={business.phoneHref} class="mt-4 block text-2xl font-bold text-blue-300 hover:underline focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300">
+						{business.phone}
+					</a>
+					<p class="mt-4 text-slate-300"><span class="font-semibold text-white">Hours:</span> {business.hours}</p>
+					<p class="mt-1 text-slate-300"><span class="font-semibold text-white">Address:</span> {business.address} [TODO: omit if service-area only]</p>
+				</div>
+				<form action="https://formspree.io/f/TODO_FORM_ID" method="POST" class="flex flex-col gap-4">
+					<div>
+						<label for="name" class="mb-1 block text-sm font-medium">Name</label>
+						<input type="text" id="name" name="name" required class="w-full rounded-md border border-slate-600 bg-slate-800 px-4 py-2 text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300" />
+					</div>
+					<div>
+						<label for="phone" class="mb-1 block text-sm font-medium">Phone</label>
+						<input type="tel" id="phone" name="phone" required class="w-full rounded-md border border-slate-600 bg-slate-800 px-4 py-2 text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300" />
+					</div>
+					<div>
+						<label for="message" class="mb-1 block text-sm font-medium">Message</label>
+						<textarea id="message" name="message" rows="4" required class="w-full rounded-md border border-slate-600 bg-slate-800 px-4 py-2 text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300"></textarea>
+					</div>
+					<button type="submit" class="rounded-md bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-500 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300">
+						Send Message
+					</button>
+				</form>
+			</div>
+		</section>
+
+		<footer class="px-6 py-8 text-center text-sm text-slate-500">
+			<p>&copy; {new Date().getFullYear()} {business.name}. All rights reserved.</p>
+		</footer>
+	</main>
+</Layout>
