@@ -16,6 +16,13 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.env.example
+
+# client data — this template repo is PUBLIC.
+# A populated client.config.json holds a real business's address, phone, and
+# reviews; it belongs in that client's own private repo under clients/<slug>/,
+# never here. Scaffolding writes this file locally; keep it untracked.
+client.config.json
 
 # macOS-specific files
 .DS_Store
