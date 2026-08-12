@@ -24,16 +24,20 @@ missing or any thin `differentiators` data.
 
 ### Step 2 — Create the repo from template
 ```bash
-gh repo create <client-slug>-site \
-  --template your-username/local-site-template \
-  --public \
-  --clone
-cd <client-slug>-site
+gh repo create viabolat/<client-slug>-site \
+  --template viabolat/local-site-template \
+  --private \
+  --clone ../clients/<client-slug>-site
+cd ../clients/<client-slug>-site
 ```
+
+**Private, always.** A client site repo carries the business's real address, phone,
+and unpublished copy before launch. The deployed *site* is public; the repo is not.
+This template repo is the only public one in the set.
 
 ### Step 3 — Populate config and generate content
 - Write `client.config.json` into the new repo.
-- Apply the matching trade preset from `presets/<trade_type>.json` as defaults for
+- Apply the matching trade preset from `presets/<trade_type>_preset.json` as defaults for
   any optional fields not supplied (icons, emergency_banner default, etc.).
 - Generate all page copy following `COPYWRITING_AND_SEO.md` rules.
 - Generate SEO title, H1, meta description, and LocalBusiness schema.

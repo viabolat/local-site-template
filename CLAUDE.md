@@ -21,7 +21,7 @@ When starting any task in this project, read files in this order:
 4. `CLIENT_CONFIG_SCHEMA.md` — the data model for each client
 5. `COPYWRITING_AND_SEO.md` — how to write content for each client
 6. `NEW_CLIENT_WORKFLOW.md` — the exact step-by-step process to run
-7. `presets/plumber.json` — example trade preset (reference only)
+7. `presets/plumber_preset.json` — example trade preset (reference only)
 
 ## Core Principles
 
@@ -53,16 +53,30 @@ When starting any task in this project, read files in this order:
 
 ## File Map (what you will generate per new client)
 
+**One repo per client, not a subfolder of this one.** `NEW_CLIENT_WORKFLOW.md` Step 2
+creates `<client-slug>-site` from this template; everything below is generated *inside
+that new repo*, at its root. This repo stays the pristine template and never
+accumulates client folders — `client.config.json` here is gitignored for that reason.
+
 ```
-clients/<client-slug>/
-├── client.config.json      # from CLIENT_CONFIG_SCHEMA.md
+<client-slug>-site/            # its own private GitHub repo + its own Vercel project
+├── client.config.json         # from CLIENT_CONFIG_SCHEMA.md — the only file
+│                              #   scripts/generate.mjs writes (to the repo root)
 ├── src/
-│   ├── pages/index.astro   # generated from SITE_TEMPLATE_SPEC.md
-│   └── content/copy.json   # generated per COPYWRITING_AND_SEO.md
+│   ├── pages/index.astro      # generated from SITE_TEMPLATE_SPEC.md
+│   └── content/copy.json      # generated per COPYWRITING_AND_SEO.md
 ├── public/
-│   └── images/             # placeholder folder, client supplies real photos
-└── README.md               # client-specific deployment notes
+│   └── images/                # placeholder folder, client supplies real photos
+└── README.md                  # client-specific deployment notes
 ```
+
+Local checkouts of client repos live in `../clients/` alongside this one. That folder
+is deliberately not a git repo — see `../clients/README.md`.
+
+**Known cost of this model:** because each client is a full copy of the template,
+template improvements do not propagate to sites already shipped. "Never fork the
+visual structure per client" (above) is the intent, but the mechanism is copy-on-create
+— a fix to `src/` here reaches only clients created after it. Backporting is manual.
 
 ## Success Criteria for Any Client Site
 
