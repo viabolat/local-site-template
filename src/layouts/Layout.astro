@@ -4,21 +4,37 @@ import '../styles/global.css';
 interface Props {
 	title: string;
 	description: string;
+	headingFont?: string;
+	bodyFont?: string;
 }
 
-const { title, description } = Astro.props;
+const { 
+	title, 
+	description, 
+	headingFont = 'Outfit', 
+	bodyFont = 'Inter' 
+} = Astro.props;
+
+// Format font names for Google Fonts URL
+const headingFontEncoded = encodeURIComponent(headingFont);
+const bodyFontEncoded = encodeURIComponent(bodyFont);
+const googleFontsUrl = `https://fonts.googleapis.com/css2?family=${headingFontEncoded}:wght@600;700;800&family=${bodyFontEncoded}:wght@300;400;500;600;700&display=swap`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="description" content={description} />
 		<title>{title}</title>
+		
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href={googleFontsUrl} rel="stylesheet" />
 	</head>
-	<body class="bg-white text-slate-900 antialiased">
+	<body class="bg-white text-slate-900 antialiased selection:bg-slate-900 selection:text-white">
 		<a
 			href="#main-content"
 			class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-blue-700 focus:px-4 focus:py-2 focus:text-white"
@@ -28,3 +44,12 @@ const { title, description } = Astro.props;
 		<slot />
 	</body>
 </html>
+
+<style is:global define:vars={{ headingFont, bodyFont }}>
+	h1, h2, h3, h4, h5, h6, .font-heading {
+		font-family: var(--headingFont), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+	}
+	body, p, span, li, button, input, textarea, label, a {
+		font-family: var(--bodyFont), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	}
+</style>

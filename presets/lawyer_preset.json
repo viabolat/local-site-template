@@ -1,0 +1,28 @@
+{
+  "trade_type": "lawyer",
+  "emergency_banner_default": false,
+  "pricing_display_default": "estimate",
+  "default_services": [
+    { "title": "Personal Injury",    "description_hint": "car accidents, slip and fall, workplace injuries, wrongful death" },
+    { "title": "Family Law",         "description_hint": "divorce, child custody, child support, adoption" },
+    { "title": "Criminal Defense",   "description_hint": "DUI, misdemeanor, felony defense, expungement" },
+    { "title": "Estate Planning",    "description_hint": "wills, trusts, probate, power of attorney" },
+    { "title": "Business Law",       "description_hint": "contracts, LLC formation, disputes, employment" }
+  ],
+  "seo_defaults": {
+    "primary_service_examples": [
+      "Personal Injury Attorney",
+      "Family Law Attorney",
+      "Criminal Defense Lawyer"
+    ]
+  },
+  "trust_badge_examples": [
+    "Free Initial Consultation",
+    "No Fee Unless You Win",
+    "Board Certified",
+    "Licensed in [State]",
+    "[X] Years of Experience"
+  ],
+  "brand_color_hint": "Deep navy #1e3a5f primary, gold accent #c9a84c — professional and trustworthy.",
+  "notes": "Use formal, reassuring copy. Avoid hype or guarantees of outcomes. Emphasize experience, results record, and client focus. Never promise specific legal outcomes."
+}

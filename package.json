@@ -9,7 +9,12 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "generate": "node scripts/generate.mjs"
+  },
+  "devDependencies": {
+    "@anthropic-ai/claude-agent-sdk": "latest",
+    "dotenv": "^17.4.2"
   },
   "dependencies": {
     "@astrojs/tailwind": "^6.0.2",

@@ -1,0 +1,30 @@
+{
+  "trade_type": "restaurant",
+  "emergency_banner_default": false,
+  "pricing_display_default": "none",
+  "default_services": [
+    { "title": "Dine-In",       "description_hint": "seating capacity, atmosphere, reservations, wait times" },
+    { "title": "Takeout",       "description_hint": "call-ahead, online ordering, curbside pickup" },
+    { "title": "Catering",      "description_hint": "corporate events, weddings, private parties, delivery radius" },
+    { "title": "Private Events","description_hint": "private dining room, full buyout, event packages, minimum spend" },
+    { "title": "Happy Hour",    "description_hint": "daily specials, drink deals, bar menu" }
+  ],
+  "seo_defaults": {
+    "primary_service_examples": [
+      "Restaurant",
+      "Cafe",
+      "Catering",
+      "Fine Dining",
+      "Breakfast & Lunch"
+    ]
+  },
+  "trust_badge_examples": [
+    "Family-Owned",
+    "Open 7 Days",
+    "Online Ordering",
+    "4.5★ on Yelp",
+    "Locally Sourced Ingredients"
+  ],
+  "brand_color_hint": "Warm tones — deep brown #4a2c2a or dark plum #2d1b3d with gold #d4a853. Avoid cold colors.",
+  "notes": "Focus on atmosphere, ingredients, and the dining experience. Hours and location are the highest-converting info for restaurants. Always display hours prominently. Cuisine type should be in the hero headline."
+}

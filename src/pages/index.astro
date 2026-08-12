@@ -1,206 +1,424 @@
 ---
+/**
+ * index.astro — data-driven landing page
+ *
+ * All content comes from client.config.json at the project root.
+ * To regenerate for a new client: npm run generate
+ */
 import Layout from '../layouts/Layout.astro';
+import config from '../../client.config.json';
 
-// Placeholder config — this block stands in for client.config.json until a real
-// client is scaffolded (see CLIENT_CONFIG_SCHEMA.md). No real business data belongs
-// here; every value below is a TODO for the per-client generation step.
+// ── Derived values ─────────────────────────────────────────────────────────
 const business = {
-	name: '[Business Name]',
-	primaryService: '[Primary Service]',
-	city: '[City]',
-	phone: '[555-555-5555]',
-	phoneHref: 'tel:+15555555555',
-	yearsInBusiness: '[X]',
-	hours: '[Mon–Fri: 8am–6pm, Sat: 9am–2pm, Sun: Closed]',
-	address: '[Street Address, City, State ZIP]',
+  name:            config.business_name,
+  primaryService:  config.seo?.primary_service ?? config.trade_type,
+  city:            config.city,
+  phone:           config.phone,
+  phoneHref:       config.phone_href,
+  yearsInBusiness: config.years_in_business ?? null,
+  hours:           config.hours            ?? null,
+  address:         config.address          ?? null,
 };
 
-// Trade-specific toggles (config-driven, not separate templates) — see
-// "Trade-Specific Toggles" in SITE_TEMPLATE_SPEC.md.
-const emergencyBanner = false;
-const pricingDisplay = 'fixed'; // "fixed" | "estimate" | "none"
+const emergencyBanner = config.emergency_banner ?? false;
+const pricingDisplay  = config.pricing_display  ?? 'none';
+const services        = config.services         ?? [];
+const serviceAreas    = config.service_area     ?? [];
+const reviews         = config.reviews          ?? [];
+const trustBadges     = config.trust_badges     ?? [];
+const differentiators = config.differentiators  ?? [];
 
-const services = [
-	{ title: '[Service One]', description: '[One to two sentences describing this service, unique to this client.]' },
-	{ title: '[Service Two]', description: '[One to two sentences describing this service, unique to this client.]' },
-	{ title: '[Service Three]', description: '[One to two sentences describing this service, unique to this client.]' },
-	{ title: '[Service Four]', description: '[One to two sentences describing this service, unique to this client.]' },
-];
+const heroHeadline    = config.hero_headline ?? `${business.primaryService} in ${business.city}`;
+const heroSubhead     = config.hero_subhead  ?? '';
+const metaDescription = config.seo?.meta_description
+  ?? `${business.name} — ${business.primaryService} in ${business.city}.`;
 
-const serviceAreas = ['[Neighborhood One]', '[Neighborhood Two]', '[Neighborhood Three]', '[Neighborhood Four]'];
+// Brand styles
+const primaryColor   = config.brand?.primary_color   ?? '#2563eb';
+const secondaryColor = config.brand?.secondary_color ?? '#1d4ed8';
+const formEndpoint   = config.form_endpoint ?? '#';
+const headingFont    = config.brand?.font_headings   ?? 'Outfit';
+const bodyFont       = config.brand?.font_body       ?? 'Inter';
+const themeStyle     = config.brand?.theme_style     ?? 'corporate-clean';
 
-const galleryPlaceholders = Array.from({ length: 6 }, (_, i) => i + 1);
+// Style mapping based on themeStyle
+let heroClass = "";
+let cardClass = "";
+let sectionClass = "";
+let buttonPrimaryClass = "";
+let buttonOutlineClass = "";
+let iconWrapClass = "";
+let badgeClass = "";
+let reviewStarColor = "text-amber-400";
+
+if (themeStyle === 'classic-serif') {
+  // Lawyer / Professional look: elegant, spacious, gold/navy accent borders, serifs
+  heroClass = "bg-slate-950 text-stone-100 border-b border-stone-800 text-center items-center py-28 px-6";
+  cardClass = "bg-white border border-stone-200 shadow-sm hover:shadow-lg transition-all duration-300 rounded-none p-8 border-t-4 border-t-[var(--brand-primary)]";
+  sectionClass = "bg-stone-50/50 py-20 px-6";
+  buttonPrimaryClass = "rounded-none uppercase tracking-widest px-8 py-3.5 bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-secondary)] font-semibold transition-all";
+  buttonOutlineClass = "rounded-none uppercase tracking-widest px-8 py-3.5 border border-white text-white hover:bg-white hover:text-slate-900 font-semibold transition-all";
+  iconWrapClass = "border border-[var(--brand-primary)] text-[var(--brand-primary)] bg-transparent";
+  badgeClass = "rounded-none border border-stone-300 text-stone-700 bg-white font-serif italic";
+  reviewStarColor = "text-yellow-600";
+} else if (themeStyle === 'modern-bold') {
+  // Heavy tech / Trades: High energy, solid backgrounds, thick borders, neo-brutalist shadows
+  heroClass = "bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 text-white py-24 px-6 relative overflow-hidden";
+  cardClass = "bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] transition-all duration-200 rounded-xl p-6";
+  sectionClass = "bg-slate-50/70 py-20 px-6";
+  buttonPrimaryClass = "rounded-xl font-bold px-7 py-4 bg-[var(--brand-primary)] text-white shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 hover:bg-[var(--brand-secondary)] transition-all";
+  buttonOutlineClass = "rounded-xl font-bold px-7 py-4 border-2 border-white text-white hover:bg-white hover:text-slate-900 hover:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] transition-all";
+  iconWrapClass = "bg-slate-900 text-white shadow-[2px_2px_0px_0px_var(--brand-primary)]";
+  badgeClass = "rounded-lg border-2 border-slate-900 bg-white text-slate-900 font-bold px-3 py-1";
+} else if (themeStyle === 'elegant-dark') {
+  // Fine Dining / Premium: Deep dark palette, elegant highlights, glowing borders
+  heroClass = "bg-gradient-to-b from-stone-950 via-stone-900 to-stone-950 text-white text-center items-center py-32 px-6";
+  cardClass = "bg-stone-900/40 border border-stone-800 backdrop-blur-md shadow-2xl hover:border-[var(--brand-secondary)] transition-all duration-300 rounded-2xl p-7 text-stone-200";
+  sectionClass = "bg-stone-950 text-stone-300 py-20 px-6";
+  buttonPrimaryClass = "rounded-full px-8 py-3.5 bg-[var(--brand-primary)] text-white shadow-lg hover:shadow-[var(--brand-primary)]/40 hover:bg-[var(--brand-secondary)] transition-all font-medium";
+  buttonOutlineClass = "rounded-full px-8 py-3.5 border border-stone-700 text-stone-300 hover:border-white hover:text-white transition-all font-medium";
+  iconWrapClass = "bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-secondary)] text-white";
+  badgeClass = "rounded-full border border-stone-800 text-stone-400 bg-stone-900/60";
+  reviewStarColor = "text-amber-500";
+} else if (themeStyle === 'warm-organic') {
+  // Cozy / Friendly / Wellness: Curved, warm backgrounds, soft drop shadows
+  heroClass = "bg-gradient-to-br from-emerald-950 via-teal-900 to-stone-900 text-white py-24 px-6";
+  cardClass = "bg-white border border-stone-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_10px_30px_-6px_rgba(0,0,0,0.08)] hover:scale-[1.01] transition-all duration-300 rounded-3xl p-7";
+  sectionClass = "bg-stone-50/40 py-20 px-6";
+  buttonPrimaryClass = "rounded-2xl font-medium px-8 py-4 bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-secondary)] shadow-md shadow-emerald-950/10 transition-all";
+  buttonOutlineClass = "rounded-2xl font-medium px-8 py-4 border border-white/30 text-white hover:bg-white/10 transition-all";
+  iconWrapClass = "bg-emerald-50 text-emerald-800";
+  badgeClass = "rounded-full bg-emerald-50/80 text-emerald-800 px-4 py-1.5 font-medium";
+} else {
+  // Corporate Clean (Default): Sharp geometries, soft colors, premium business shadows
+  heroClass = "bg-gradient-to-tr from-slate-900 to-slate-800 text-white py-24 px-6";
+  cardClass = "bg-white border border-slate-100/80 shadow-md hover:shadow-xl hover:border-slate-200 transition-all duration-300 rounded-2xl p-6";
+  sectionClass = "bg-slate-50/50 py-20 px-6";
+  buttonPrimaryClass = "rounded-xl font-semibold px-7 py-3.5 bg-[var(--brand-primary)] text-white shadow-md shadow-blue-500/10 hover:bg-[var(--brand-secondary)] transition-all";
+  buttonOutlineClass = "rounded-xl font-semibold px-7 py-3.5 border border-slate-700 text-slate-300 hover:border-white hover:text-white transition-all";
+  iconWrapClass = "bg-blue-50 text-blue-700";
+  badgeClass = "rounded-lg bg-slate-100 text-slate-700 px-3.5 py-1.5 font-medium";
+}
 ---
 
 <Layout
-	title={`${business.name} | ${business.primaryService} in ${business.city}`}
-	description={`${business.name} provides ${business.primaryService} in ${business.city}. TODO: replace with client-specific SEO description.`}
+  title={`${business.name} | ${business.primaryService} in ${business.city}`}
+  description={metaDescription}
+  headingFont={headingFont}
+  bodyFont={bodyFont}
 >
-	<main id="main-content">
-		<!-- 1. Hero -->
-		<header class="bg-slate-900 text-white">
-			{
-				emergencyBanner && (
-					<div class="bg-red-600 px-4 py-2 text-center text-sm font-semibold text-white">
-						24/7 Emergency Service Available
-					</div>
-				)
-			}
-			<div class="mx-auto flex max-w-5xl flex-col items-start gap-6 px-6 py-20">
-				<p class="text-lg font-semibold text-blue-300">{business.name}</p>
-				<h1 class="text-4xl font-bold leading-tight sm:text-5xl">
-					{business.primaryService} in {business.city}
-				</h1>
-				<p class="max-w-2xl text-lg text-slate-300">
-					[One sentence of differentiation — years in business, guarantee, satisfaction promise, etc.]
-				</p>
-				<div class="flex flex-wrap gap-4">
-					<a
-						href={business.phoneHref}
-						class="rounded-md bg-blue-600 px-6 py-3 text-lg font-semibold text-white transition hover:bg-blue-500 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300"
-					>
-						Call {business.phone}
-					</a>
-					<a
-						href="#contact"
-						class="rounded-md border border-white px-6 py-3 text-lg font-semibold text-white transition hover:bg-white hover:text-slate-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300"
-					>
-						Get a Free Quote
-					</a>
-				</div>
-			</div>
-		</header>
+  <!-- Set brand color variables in CSS scope -->
+  <style define:vars={{ primaryColor, secondaryColor }}>
+    :root {
+      --brand-primary:   var(--primaryColor);
+      --brand-secondary: var(--secondaryColor);
+    }
+  </style>
 
-		<!-- 2. Services -->
-		<section aria-labelledby="services-heading" class="mx-auto max-w-5xl px-6 py-16">
-			<h2 id="services-heading" class="text-3xl font-bold">Our Services</h2>
-			<p class="mt-2 text-slate-600">
-				{pricingDisplay === 'fixed' && 'Straightforward, upfront pricing on every job.'}
-				{pricingDisplay === 'estimate' && 'Free estimates on every service below.'}
-				{pricingDisplay === 'none' && 'Contact us for details on any service below.'}
-			</p>
-			<ul class="mt-8 grid gap-6 sm:grid-cols-2">
-				{
-					services.map((service) => (
-						<li class="rounded-lg border border-slate-200 p-6">
-							<div class="mb-3 flex h-10 w-10 items-center justify-center rounded-md bg-blue-100 text-blue-700" aria-hidden="true">
-								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
-									<path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-								</svg>
-							</div>
-							<h3 class="text-xl font-semibold">{service.title}</h3>
-							<p class="mt-2 text-slate-600">{service.description}</p>
-						</li>
-					))
-				}
-			</ul>
-		</section>
+  <!-- Sticky glassmorphic navbar -->
+  <nav class="sticky top-0 z-40 w-full border-b border-slate-200/40 bg-white/80 backdrop-blur-md transition-all">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <a href="#" class="font-heading text-xl font-bold tracking-tight text-slate-900 hover:opacity-85">
+        {business.name}
+      </a>
+      <div class="flex items-center gap-4">
+        <span class="hidden text-sm font-medium text-slate-600 sm:inline">
+          {business.hours}
+        </span>
+        <a
+          href={business.phoneHref}
+          class="inline-flex items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5">
+            <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5h-1.15a14.5 14.5 0 01-12.75-12.75V3.5z" clip-rule="evenodd" />
+          </svg>
+          Call Now
+        </a>
+      </div>
+    </div>
+  </nav>
 
-		<!-- 3. Trust Signals -->
-		<section aria-labelledby="trust-heading" class="bg-slate-50 px-6 py-16">
-			<div class="mx-auto max-w-5xl">
-				<h2 id="trust-heading" class="text-3xl font-bold">Why Choose Us</h2>
-				<dl class="mt-8 grid gap-8 sm:grid-cols-3">
-					<div>
-						<dt class="text-sm font-semibold uppercase tracking-wide text-slate-500">Years in Business</dt>
-						<dd class="mt-1 text-2xl font-bold">{business.yearsInBusiness}</dd>
-					</div>
-					<div>
-						<dt class="text-sm font-semibold uppercase tracking-wide text-slate-500">Licensed &amp; Insured</dt>
-						<dd class="mt-1 text-2xl font-bold">[TODO: confirm with client before publishing]</dd>
-					</div>
-					<div>
-						<dt class="text-sm font-semibold uppercase tracking-wide text-slate-500">Certifications</dt>
-						<dd class="mt-1 text-2xl font-bold">[TODO: add if provided by client]</dd>
-					</div>
-				</dl>
-			</div>
-		</section>
+  <main id="main-content">
 
-		<!-- 4. Reviews / Social Proof -->
-		<section aria-labelledby="reviews-heading" class="mx-auto max-w-5xl px-6 py-16">
-			<h2 id="reviews-heading" class="text-3xl font-bold">What Our Customers Say</h2>
-			<p class="mt-2 text-sm text-slate-500">
-				[TODO: replace with 3–5 real reviews before launch. Omit this section entirely if the client has none yet — never fabricate reviews.]
-			</p>
-			<ul class="mt-8 grid gap-6 sm:grid-cols-3">
-				{
-					[1, 2, 3].map((n) => (
-						<li class="rounded-lg border border-slate-200 p-6">
-							<div class="text-amber-500" aria-label="Placeholder rating">★★★★★</div>
-							<p class="mt-3 text-slate-600">"[Placeholder review quote — replace with a real client review.]"</p>
-							<p class="mt-3 font-semibold">[Reviewer Name {n}]</p>
-						</li>
-					))
-				}
-			</ul>
-		</section>
+    <!-- ─────────────────────────────────────────────────────────────────────
+         1. HERO
+         ──────────────────────────────────────────────────────────────────── -->
+    <header class={heroClass}>
+      <!-- Background subtle glows for premium feel -->
+      <div class="absolute -left-1/4 -top-1/4 -z-10 h-96 w-96 rounded-full bg-[var(--brand-primary)]/10 blur-[100px]"></div>
+      <div class="absolute -right-1/4 -bottom-1/4 -z-10 h-96 w-96 rounded-full bg-[var(--brand-secondary)]/10 blur-[100px]"></div>
 
-		<!-- 5. Gallery -->
-		<section aria-labelledby="gallery-heading" class="bg-slate-50 px-6 py-16">
-			<div class="mx-auto max-w-5xl">
-				<h2 id="gallery-heading" class="text-3xl font-bold">Recent Work</h2>
-				<p class="mt-2 text-sm text-slate-500">[TODO: replace with real client-supplied photos and descriptive alt text.]</p>
-				<ul class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
-					{
-						galleryPlaceholders.map((n) => (
-							<li class="flex aspect-square items-center justify-center rounded-lg bg-slate-200 text-slate-400" role="img" aria-label={`Placeholder photo ${n} of completed work — TODO: replace with real client photo and descriptive alt text`}>
-								Photo {n}
-							</li>
-						))
-					}
-				</ul>
-			</div>
-		</section>
+      {emergencyBanner && (
+        <div class="absolute top-0 left-0 right-0 bg-red-600 px-4 py-2.5 text-center text-xs font-bold tracking-wider uppercase text-white z-10 animate-pulse">
+          🚨 24/7 Emergency Service Available — Call Immediately
+        </div>
+      )}
 
-		<!-- 6. Service Area -->
-		<section aria-labelledby="service-area-heading" class="mx-auto max-w-5xl px-6 py-16">
-			<h2 id="service-area-heading" class="text-3xl font-bold">Proudly Serving</h2>
-			<ul class="mt-6 flex flex-wrap gap-3">
-				{
-					serviceAreas.map((area) => (
-						<li class="rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700">{area}</li>
-					))
-				}
-			</ul>
-			<div class="mt-8 flex aspect-video items-center justify-center rounded-lg bg-slate-200 text-slate-400" role="img" aria-label="Placeholder service area map — TODO: embed real map if used">
-				[Optional embedded map]
-			</div>
-		</section>
+      <div class="mx-auto flex max-w-4xl flex-col items-center gap-6 text-center py-12">
+        
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold tracking-wider uppercase text-white/90 backdrop-blur-sm">
+          <span class="h-2 w-2 rounded-full bg-[var(--brand-primary)]"></span>
+          Now Booking in {business.city}
+        </span>
 
-		<!-- 7. Contact -->
-		<section id="contact" aria-labelledby="contact-heading" class="bg-slate-900 px-6 py-16 text-white">
-			<div class="mx-auto max-w-5xl grid gap-12 sm:grid-cols-2">
-				<div>
-					<h2 id="contact-heading" class="text-3xl font-bold">Get In Touch</h2>
-					<a href={business.phoneHref} class="mt-4 block text-2xl font-bold text-blue-300 hover:underline focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300">
-						{business.phone}
-					</a>
-					<p class="mt-4 text-slate-300"><span class="font-semibold text-white">Hours:</span> {business.hours}</p>
-					<p class="mt-1 text-slate-300"><span class="font-semibold text-white">Address:</span> {business.address} [TODO: omit if service-area only]</p>
-				</div>
-				<form action="https://formspree.io/f/TODO_FORM_ID" method="POST" class="flex flex-col gap-4">
-					<div>
-						<label for="name" class="mb-1 block text-sm font-medium">Name</label>
-						<input type="text" id="name" name="name" required class="w-full rounded-md border border-slate-600 bg-slate-800 px-4 py-2 text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300" />
-					</div>
-					<div>
-						<label for="phone" class="mb-1 block text-sm font-medium">Phone</label>
-						<input type="tel" id="phone" name="phone" required class="w-full rounded-md border border-slate-600 bg-slate-800 px-4 py-2 text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300" />
-					</div>
-					<div>
-						<label for="message" class="mb-1 block text-sm font-medium">Message</label>
-						<textarea id="message" name="message" rows="4" required class="w-full rounded-md border border-slate-600 bg-slate-800 px-4 py-2 text-white focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300"></textarea>
-					</div>
-					<button type="submit" class="rounded-md bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-500 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-blue-300">
-						Send Message
-					</button>
-				</form>
-			</div>
-		</section>
+        <h1 class="font-heading text-4xl font-extrabold leading-tight tracking-tight sm:text-6xl text-white">
+          {heroHeadline}
+        </h1>
 
-		<footer class="px-6 py-8 text-center text-sm text-slate-500">
-			<p>&copy; {new Date().getFullYear()} {business.name}. All rights reserved.</p>
-		</footer>
-	</main>
+        {heroSubhead && (
+          <p class="max-w-2xl text-lg text-slate-350 font-normal leading-relaxed text-slate-300">
+            {heroSubhead}
+          </p>
+        )}
+
+        <!-- CTAs -->
+        <div class="flex flex-wrap justify-center gap-4 pt-4">
+          <a href={business.phoneHref} class={buttonPrimaryClass}>
+            Call {business.phone}
+          </a>
+          <a href="#contact" class={buttonOutlineClass}>
+            Get a Free Quote
+          </a>
+        </div>
+
+        <!-- Trust badges in hero -->
+        {trustBadges.length > 0 && (
+          <div class="pt-8">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Our Credentials</p>
+            <ul class="flex flex-wrap justify-center gap-3" aria-label="Trust badges">
+              {trustBadges.map(badge => (
+                <li class="rounded-full border border-slate-800 bg-slate-900/60 px-4.5 py-2 text-xs font-medium text-slate-300 backdrop-blur-sm">
+                  {badge}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+      </div>
+    </header>
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         2. SERVICES
+         ──────────────────────────────────────────────────────────────────── -->
+    <section aria-labelledby="services-heading" class="mx-auto max-w-5xl px-6 py-24">
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <h2 id="services-heading" class="font-heading text-4xl font-extrabold tracking-tight">Our Services</h2>
+        <div class="h-1.5 w-16 bg-[var(--brand-primary)] mx-auto mt-4 rounded-full"></div>
+        <p class="mt-4 text-slate-650 text-slate-600">
+          {pricingDisplay === 'fixed'    && 'Straightforward, upfront pricing on every job. Clear expectations from day one.'}
+          {pricingDisplay === 'estimate' && 'Free estimates on every service below. No hidden fees or surprise charges.'}
+          {pricingDisplay === 'none'     && 'Contact us for details on any service below. Tailored solutions for your needs.'}
+        </p>
+      </div>
+
+      <ul class="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
+        {services.map(service => (
+          <li class={cardClass}>
+            <div class={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl ${iconWrapClass}`} aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.5" class="h-6 w-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="font-heading text-xl font-bold text-slate-900">{service.title}</h3>
+            <p class="mt-3 text-sm text-slate-600 leading-relaxed">{service.description}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         3. TRUST SIGNALS
+         ──────────────────────────────────────────────────────────────────── -->
+    <section aria-labelledby="trust-heading" class={sectionClass}>
+      <div class="mx-auto max-w-5xl">
+        <div class="grid gap-12 md:grid-cols-3 items-center">
+          
+          <div class="md:col-span-1">
+            <h2 id="trust-heading" class="font-heading text-3xl font-extrabold tracking-tight">Why Choose Our Team?</h2>
+            <p class="mt-3 text-sm text-slate-600 leading-relaxed">
+              We hold our work to the highest standards of safety, quality, and responsiveness. Read what distinguishes us from others.
+            </p>
+          </div>
+
+          <div class="md:col-span-2">
+            <dl class="grid gap-8 sm:grid-cols-3">
+              {business.yearsInBusiness && (
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                  <dt class="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Years Serving {business.city}
+                  </dt>
+                  <dd class="mt-2 text-5xl font-extrabold tracking-tight text-brand">
+                    {business.yearsInBusiness}+
+                  </dd>
+                </div>
+              )}
+              {differentiators.map(diff => (
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-[var(--brand-primary)]">
+                  <dt class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Differentiator</dt>
+                  <dd class="text-base font-bold text-slate-800 leading-snug">{diff}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         4. REVIEWS — only rendered if real reviews exist
+         ──────────────────────────────────────────────────────────────────── -->
+    {reviews.length > 0 && (
+      <section aria-labelledby="reviews-heading" class="mx-auto max-w-5xl px-6 py-24">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <h2 id="reviews-heading" class="font-heading text-4xl font-extrabold tracking-tight">What Our Customers Say</h2>
+          <div class="h-1.5 w-16 bg-[var(--brand-primary)] mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {reviews.map(review => (
+            <li class="bg-slate-50 p-8 rounded-2xl border border-slate-100 flex flex-col justify-between hover:scale-[1.01] transition-all">
+              <div>
+                <div class={`flex gap-1 ${reviewStarColor}`} aria-label={`${review.rating ?? 5} out of 5 stars`}>
+                  {'★'.repeat(review.rating ?? 5)}{'☆'.repeat(5 - (review.rating ?? 5))}
+                </div>
+                <p class="mt-5 text-slate-650 text-slate-700 italic leading-relaxed">"{review.text}"</p>
+              </div>
+              <div class="mt-6 flex items-center gap-3 pt-4 border-t border-slate-200/50">
+                <div class="h-9 w-9 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] font-bold flex items-center justify-center text-xs">
+                  {review.name.charAt(0)}
+                </div>
+                <div>
+                  <p class="font-bold text-slate-900 text-sm">{review.name}</p>
+                  <span class="text-xs text-slate-400 font-medium">Verified Customer</span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         5. GALLERY — placeholder until real photos are supplied
+         ──────────────────────────────────────────────────────────────────── -->
+    <section aria-labelledby="gallery-heading" class={`${sectionClass} border-y border-slate-200/30`}>
+      <div class="mx-auto max-w-5xl">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <h2 id="gallery-heading" class="font-heading text-4xl font-extrabold tracking-tight">Our Work in {business.city}</h2>
+          <div class="h-1.5 w-16 bg-[var(--brand-primary)] mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <ul class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          {Array.from({ length: 6 }, (_, i) => i + 1).map(n => (
+            <li
+              class="flex aspect-video items-center justify-center rounded-2xl bg-slate-200 text-xs font-semibold text-slate-400 hover:scale-[1.02] hover:shadow-md transition-all duration-300"
+              role="img"
+              aria-label={`Photo ${n} — replace with real client photo`}
+            >
+              Recent Work Photo {n}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         6. SERVICE AREA — only rendered if service_area is populated
+         ──────────────────────────────────────────────────────────────────── -->
+    {serviceAreas.length > 0 && (
+      <section aria-labelledby="service-area-heading" class="mx-auto max-w-5xl px-6 py-24 text-center">
+        <h2 id="service-area-heading" class="font-heading text-3xl font-extrabold tracking-tight">Cities & Neighborhoods We Serve</h2>
+        <div class="h-1.5 w-16 bg-[var(--brand-primary)] mx-auto mt-4 rounded-full"></div>
+        
+        <ul class="mt-10 flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
+          {serviceAreas.map(area => (
+            <li class={badgeClass}>{area}</li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- ─────────────────────────────────────────────────────────────────────
+         7. CONTACT
+         ──────────────────────────────────────────────────────────────────── -->
+    <section id="contact" aria-labelledby="contact-heading"
+             class="bg-slate-955 bg-slate-900 px-6 py-24 text-white relative overflow-hidden">
+      <!-- Background subtle glows -->
+      <div class="absolute -right-1/4 -top-1/4 -z-10 h-96 w-96 rounded-full bg-[var(--brand-primary)]/10 blur-[100px]"></div>
+
+      <div class="mx-auto grid max-w-5xl gap-16 md:grid-cols-12 items-center">
+
+        <!-- Left: contact info -->
+        <div class="md:col-span-5">
+          <h2 id="contact-heading" class="font-heading text-4xl font-extrabold tracking-tight">Request a Quote</h2>
+          <p class="mt-4 text-slate-400 text-sm leading-relaxed">
+            Fill out the form to get a quick estimate. If this is an emergency or you need immediate service, please call directly.
+          </p>
+          
+          <a href={business.phoneHref}
+             class="mt-8 inline-flex items-center gap-3 rounded-2xl bg-white/10 hover:bg-white/15 px-6 py-4 text-2xl font-bold tracking-tight text-white border border-white/10 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-6 w-6 text-[var(--brand-primary)]">
+              <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 013.5 2h1.148a1.5 1.5 0 011.465 1.175l.716 3.223a1.5 1.5 0 01-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 006.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 011.767-1.052l3.223.716A1.5 1.5 0 0118 15.352V16.5a1.5 1.5 0 01-1.5 1.5h-1.15a14.5 14.5 0 01-12.75-12.75V3.5z" clip-rule="evenodd" />
+            </svg>
+            {business.phone}
+          </a>
+
+          <dl class="mt-8 space-y-4 text-sm text-slate-300 border-t border-white/10 pt-8">
+            {business.hours && (
+              <div class="flex gap-2">
+                <dt class="font-semibold text-white">Hours:</dt>
+                <dd>{business.hours}</dd>
+              </div>
+            )}
+            {business.address && (
+              <div class="flex gap-2">
+                <dt class="font-semibold text-white">Office:</dt>
+                <dd>{business.address}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+
+        <!-- Right: contact form (Formspree) -->
+        <div class="md:col-span-7 bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl relative">
+          <form action={formEndpoint} method="POST" class="flex flex-col gap-5">
+            <div>
+              <label for="name" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-400">Name</label>
+              <input type="text" id="name" name="name" required
+                     class="w-full rounded-xl border border-slate-700 bg-slate-800/80
+                            px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]" />
+            </div>
+            <div>
+              <label for="phone" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-400">Phone</label>
+              <input type="tel" id="phone" name="phone" required
+                     class="w-full rounded-xl border border-slate-700 bg-slate-800/80
+                            px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]" />
+            </div>
+            <div>
+              <label for="message" class="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-400">Message</label>
+              <textarea id="message" name="message" rows="4" required
+                        class="w-full rounded-xl border border-slate-700 bg-slate-800/80
+                               px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"></textarea>
+            </div>
+            <button type="submit"
+                    class="w-full rounded-xl px-6 py-4 font-bold text-white transition-all bg-[var(--brand-primary)] hover:bg-[var(--brand-secondary)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--brand-primary)]">
+              Send Message
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="px-6 py-12 text-center text-xs text-slate-500 border-t border-slate-100 bg-slate-50">
+      <p>© {new Date().getFullYear()} {business.name}. All rights reserved.</p>
+      <p class="mt-1 text-slate-400">Designed for conversion optimization and local SEO.</p>
+    </footer>
+
+  </main>
 </Layout>

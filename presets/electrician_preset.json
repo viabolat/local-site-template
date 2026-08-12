@@ -1,0 +1,28 @@
+{
+  "trade_type": "electrician",
+  "emergency_banner_default": true,
+  "pricing_display_default": "estimate",
+  "default_services": [
+    { "title": "Electrical Panel Upgrades",  "description_hint": "service panel replacement, breaker upgrades, subpanel additions" },
+    { "title": "Residential Wiring",         "description_hint": "new construction, rewiring, outlets, switches" },
+    { "title": "EV Charger Installation",    "description_hint": "Level 2 home charging stations, NEMA 14-50 outlets" },
+    { "title": "Lighting & Ceiling Fans",    "description_hint": "installation, replacement, recessed lighting, dimmer switches" },
+    { "title": "Emergency Electrical",       "description_hint": "power outages, tripped breakers, sparking outlets, 24/7 response" }
+  ],
+  "seo_defaults": {
+    "primary_service_examples": [
+      "Licensed Electrician",
+      "Residential Electrician",
+      "Emergency Electrician"
+    ]
+  },
+  "trust_badge_examples": [
+    "Licensed & Insured",
+    "Master Electrician",
+    "Same-Day Service",
+    "Upfront Pricing",
+    "24/7 Emergency"
+  ],
+  "brand_color_hint": "Dark blue #1e2d5a primary, yellow accent #f5c842 — safety and reliability.",
+  "notes": "Emphasize licensing and safety credentials — unlicensed work is a major risk people fear. Same-day service and emergency availability are strong conversion drivers."
+}
